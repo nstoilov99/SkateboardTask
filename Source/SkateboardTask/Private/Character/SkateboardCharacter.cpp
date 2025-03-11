@@ -9,7 +9,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "InputMappingContext.h"
+#include "InputAction.h"
 #include "GameFramework/SpringArmComponent.h"
 
 
@@ -33,18 +34,44 @@ ASkateboardCharacter::ASkateboardCharacter()
 	SkateboardMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SkateboardMesh"));
 	SkateboardMesh->SetupAttachment(RootComponent);
 	SkateboardMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
+	SkateboardMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 	
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(TEXT("SkeletalMesh'/Game/Assets/Characters/SKM_Remy.SKM_Remy'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(TEXT("SkeletalMesh'/Game/Assets/Characters/SKM_Remy.SKM_Remy'"));
 	if (CharacterMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
-		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
+		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -95.0f));
 		GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+		GetMesh()->SetRelativeScale3D(FVector(0.45f, 0.45f, 0.45f));
 	}
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SkateboardAsset(TEXT("StaticMesh'/Game/Assets/Characters/Skateboard/SM_Skateboard.SM_Skateboard'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> SkateboardAsset(TEXT("StaticMesh'/Game/Assets/Characters/Skateboard/SM_Skateboard.SM_Skateboard'"));
 	if (SkateboardAsset.Succeeded())
 	{
 		SkateboardMesh->SetStaticMesh(SkateboardAsset.Object);
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContext(TEXT("/Game/Input/IMC_SkateboardContext.IMC_SkateboardContext"));
+	if (MappingContext.Succeeded())
+	{
+		DefaultMappingContext = MappingContext.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Input/Actions/IA_Move.IA_Move"));
+	if (MoveActionAsset.Succeeded())
+	{
+		MoveAction = MoveActionAsset.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Input/Actions/IA_Look.IA_Look"));
+	if (LookActionAsset.Succeeded())
+	{
+		LookAction = LookActionAsset.Object;
+	}
+	
+	ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Input/Actions/IA_Jump.IA_Jump"));
+	if (JumpActionAsset.Succeeded())
+	{
+		JumpAction = JumpActionAsset.Object;
 	}
 	
 	GetCharacterMovement()->bOrientRotationToMovement= true;
@@ -89,7 +116,7 @@ void ASkateboardCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (IsValid(Controller))
+	if (Controller != nullptr)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
