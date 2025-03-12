@@ -48,6 +48,35 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UStaticMeshComponent> SkateboardMesh;
+	UPROPERTY(Category=Character, VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMeshComponent> SkateboardMesh;
+
+	FTimerHandle SkateboardTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
+	FName FrontWheelSocketName;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
+	FName BackWheelSocketName;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
+	float InterpSpeedToGround{10.f};
+	
+	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
+	float SkateboardTraceOffset{30.f};
+
+	float LerpAccelerate{0.f};
+	
+	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
+	float TurnRate = 0.05f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
+	float FunctionLoopRate{0.03f};
+
+	UFUNCTION()
+	void AlignSkateboardToGround();
+
+	UFUNCTION()
+	FVector WheelTraceHitLocation(const FName& SocketName);
+	
 };

@@ -5,13 +5,14 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
 #include "InputAction.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 // Sets default values
@@ -31,13 +32,12 @@ ASkateboardCharacter::ASkateboardCharacter()
 	CameraComponent->bUsePawnControlRotation = false;
 
 	// Create and attach the skateboard mesh
-	SkateboardMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SkateboardMesh"));
+	SkateboardMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkateboardMesh"));
 	SkateboardMesh->SetupAttachment(RootComponent);
 	SkateboardMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	SkateboardMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 	
 	GetCharacterMovement()->bOrientRotationToMovement= true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 20.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
 	GetCharacterMovement()->AirControl = 0.2f;
 	PrimaryActorTick.bCanEverTick = false;
@@ -55,7 +55,44 @@ void ASkateboardCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		SkateboardTimerHandle,
+		this,
+		&ASkateboardCharacter::AlignSkateboardToGround,
+		FunctionLoopRate,
+		true
+	);
 }
+void ASkateboardCharacter::AlignSkateboardToGround()
+{
+	FVector FWHitLocation = WheelTraceHitLocation(FrontWheelSocketName);
+	FVector BWHitLocation = WheelTraceHitLocation(BackWheelSocketName);
+	FRotator NewSkateboardRotator = UKismetMathLibrary::FindLookAtRotation(BWHitLocation, FWHitLocation);
+	SkateboardMesh->SetWorldRotation(FRotator(NewSkateboardRotator.Pitch, SkateboardMesh->GetComponentRotation().Yaw, SkateboardMesh->GetComponentRotation().Roll));
+}
+
+FVector ASkateboardCharacter::WheelTraceHitLocation(const FName& SocketName)
+{
+	FHitResult HitResult;
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, this);
+	FVector StartLocation = SkateboardMesh->GetSocketLocation(SocketName) + FVector(0.0f, 0.0f, SkateboardTraceOffset);;
+	FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, -SkateboardTraceOffset);
+	if (UKismetSystemLibrary::LineTraceSingle(this,
+		StartLocation,
+		EndLocation,
+		UEngineTypes::ConvertToTraceType(ECC_Camera),
+		false,
+		TArray<AActor*>(),
+		EDrawDebugTrace::None,
+		HitResult,
+		true))
+	{
+		return HitResult.Location;
+	}
+	return SkateboardMesh->GetSocketLocation(SocketName);
+}
+
 
 // Called to bind functionality to input
 void ASkateboardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -90,9 +127,10 @@ void ASkateboardCharacter::Move(const FInputActionValue& Value)
 		// get right vector 
 		const FVector RightDirection = SkateboardMesh->GetRightVector();
 
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+		// add movement
+		LerpAccelerate = UKismetMathLibrary::Lerp(LerpAccelerate, MovementVector.Y, 0.01);
+		AddMovementInput(ForwardDirection, LerpAccelerate);
+		AddMovementInput(RightDirection, MovementVector.X * TurnRate);
 	}
 }
 
