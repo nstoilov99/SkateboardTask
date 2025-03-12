@@ -36,46 +36,8 @@ ASkateboardCharacter::ASkateboardCharacter()
 	SkateboardMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	SkateboardMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
 	
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(TEXT("SkeletalMesh'/Game/Assets/Characters/SKM_Remy.SKM_Remy'"));
-	if (CharacterMesh.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
-		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -95.0f));
-		GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-		GetMesh()->SetRelativeScale3D(FVector(0.45f, 0.45f, 0.45f));
-	}
-	ConstructorHelpers::FObjectFinder<UStaticMesh> SkateboardAsset(TEXT("StaticMesh'/Game/Assets/Characters/Skateboard/SM_Skateboard.SM_Skateboard'"));
-	if (SkateboardAsset.Succeeded())
-	{
-		SkateboardMesh->SetStaticMesh(SkateboardAsset.Object);
-	}
-	
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContext(TEXT("/Game/Input/IMC_SkateboardContext.IMC_SkateboardContext"));
-	if (MappingContext.Succeeded())
-	{
-		DefaultMappingContext = MappingContext.Object;
-	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> MoveActionAsset(TEXT("/Game/Input/Actions/IA_Move.IA_Move"));
-	if (MoveActionAsset.Succeeded())
-	{
-		MoveAction = MoveActionAsset.Object;
-	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> LookActionAsset(TEXT("/Game/Input/Actions/IA_Look.IA_Look"));
-	if (LookActionAsset.Succeeded())
-	{
-		LookAction = LookActionAsset.Object;
-	}
-	
-	ConstructorHelpers::FObjectFinder<UInputAction> JumpActionAsset(TEXT("/Game/Input/Actions/IA_Jump.IA_Jump"));
-	if (JumpActionAsset.Succeeded())
-	{
-		JumpAction = JumpActionAsset.Object;
-	}
-	
 	GetCharacterMovement()->bOrientRotationToMovement= true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 20.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
 	GetCharacterMovement()->AirControl = 0.2f;
 	PrimaryActorTick.bCanEverTick = false;
@@ -123,10 +85,10 @@ void ASkateboardCharacter::Move(const FInputActionValue& Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector ForwardDirection = SkateboardMesh->GetForwardVector();
 	
 		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector RightDirection = SkateboardMesh->GetRightVector();
 
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);

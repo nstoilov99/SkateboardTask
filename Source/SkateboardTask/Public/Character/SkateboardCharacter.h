@@ -48,6 +48,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Input)
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UStaticMeshComponent> SkateboardMesh;
 };
