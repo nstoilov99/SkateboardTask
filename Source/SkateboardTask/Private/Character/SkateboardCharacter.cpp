@@ -1,15 +1,17 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SkateboardTask/Public/Character/SkateboardCharacter.h"
+#include "Character/SkateboardCharacter.h"
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/PointSystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
+#include "ScreenPass.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -36,6 +38,9 @@ ASkateboardCharacter::ASkateboardCharacter()
 	SkateboardMesh->SetupAttachment(RootComponent);
 	SkateboardMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 	SkateboardMesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
+	
+	PointSystemComponent = CreateDefaultSubobject<UPointSystemComponent>(TEXT("PointsSystemComponent"));
+	
 	
 	GetCharacterMovement()->bOrientRotationToMovement= true;
 	GetCharacterMovement()->JumpZVelocity = 600.0f;

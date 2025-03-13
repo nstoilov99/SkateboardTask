@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "SkateboardHUD.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnAddPointsSignature, const FString&, Points);
+
 class USkateboardOverlay;
 /**
  * 
@@ -19,7 +21,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USkateboardOverlay> SkateboardOverlayClass;
-	
+
+	FOnAddPointsSignature OnAddPointsDelegate;
 protected:
 
 	virtual void BeginPlay() override;

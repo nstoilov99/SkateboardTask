@@ -18,6 +18,10 @@ class SKATEBOARDTASK_API USkateboardOverlay : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;	
 private:
+	
+	UFUNCTION()
+	void SetScore(const FString& Score);
+	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ScoreTextBlock;
 };

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "SkateboardCharacter.generated.h"
 
+class UPointSystemComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputMappingContext;
@@ -24,7 +25,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetUserAccelerating();
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UPointSystemComponent> PointSystemComponent;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
