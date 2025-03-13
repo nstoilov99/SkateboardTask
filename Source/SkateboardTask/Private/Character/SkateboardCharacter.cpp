@@ -45,7 +45,9 @@ ASkateboardCharacter::ASkateboardCharacter()
 
 float ASkateboardCharacter::GetUserAccelerating()
 {
-	return MovingForward;
+	FVector Acceleration = GetCharacterMovement()->GetCurrentAcceleration();
+	FVector ForwardDirection = FVector(Acceleration.X, 0.0f, 0.0f);
+	return ForwardDirection.Length();
 }
 
 // Called when the game starts or when spawned

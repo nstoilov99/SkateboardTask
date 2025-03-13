@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interfaces/Skating.h"
 #include "SkateboardCharacter.generated.h"
 
 class UCameraComponent;
