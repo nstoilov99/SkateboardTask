@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/Skating.h"
 #include "SkateboardCharacter.generated.h"
 
 class UCameraComponent;
@@ -21,6 +22,9 @@ class SKATEBOARDTASK_API ASkateboardCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ASkateboardCharacter();
+
+	UFUNCTION(BlueprintCallable)
+	float GetUserAccelerating();
 
 protected:
 	// Called when the game starts or when spawned
@@ -66,6 +70,8 @@ private:
 	float SkateboardTraceOffset{30.f};
 
 	float LerpAccelerate{0.f};
+
+	float MovingForward{0.f};
 	
 	UPROPERTY(EditDefaultsOnly, Category = Skateboard)
 	float TurnRate = 0.05f;
