@@ -25,6 +25,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetUserAccelerating();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsJumping();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UPointSystemComponent> PointSystemComponent;
@@ -36,6 +39,9 @@ protected:
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
+	virtual void OnJumped_Implementation() override;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Camera)
 	TObjectPtr<USpringArmComponent> CameraBoom;

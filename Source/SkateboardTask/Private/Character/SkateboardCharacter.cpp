@@ -55,6 +55,11 @@ float ASkateboardCharacter::GetUserAccelerating()
 	return ForwardDirection.Length();
 }
 
+bool ASkateboardCharacter::IsJumping()
+{
+	return GetCharacterMovement()->IsFalling();
+}
+
 // Called when the game starts or when spawned
 void ASkateboardCharacter::BeginPlay()
 {
@@ -153,5 +158,10 @@ void ASkateboardCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ASkateboardCharacter::OnJumped_Implementation()
+{
+	Super::OnJumped_Implementation();
 }
 
